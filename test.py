@@ -13,7 +13,7 @@ from data.example_dataset.dataset import get_example_dataset
 ###################### CONFIG ##############################
 ############################################################
 
-BATCH_SIZE = 8
+BATCH_SIZE = 1
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 MODEL_PATH = "data/saved_models/model_e22_udfnet_lr0.0001_bs6_lrd0.9.pth"

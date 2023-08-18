@@ -14,8 +14,10 @@ from depth_estimation.utils.visualization import gray_to_heatmap
 from data.example_dataset.dataset import get_example_dataset
 
 
-BATCH_SIZE = 6
+# BATCH_SIZE = 6
+BATCH_SIZE = 1
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# DEVICE = "cpu"
 MODEL_PATH = (
     "data/saved_models/model_e11_udfnet_lr0.0001_bs6_lrd0.9_with_infguidance.pth"
 )
@@ -66,7 +68,7 @@ def inference():
         # save outputs
         if SAVE:
             # resize = Resize(heatmap.size()[-2:])
-            resize = Resize(rgb.size()[-2:])
+            resize = Resize(rgb.size()[-2:], antialias=True)
             for i in range(rgb.size(0)):
                 index = batch_id * BATCH_SIZE + i
 

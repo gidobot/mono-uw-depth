@@ -18,7 +18,7 @@ import onnxruntime as ort
 
 
 BATCH_SIZE = 1
-MODEL_PATH = "data/saved_models/model_fp32.onnx"
+MODEL_PATH = "data/saved_models/model.onnx"
 DEVICE='cpu'
 DATASET = get_example_dataset(train=False, shuffle=False, device=DEVICE)
 OUT_PATH = "data/out"

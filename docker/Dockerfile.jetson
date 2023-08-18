@@ -47,18 +47,16 @@ apt-get install -y \
 #    && rm -rf /var/lib/apt/lists/*
 
 # pytorch
-RUN export TORCH_INSTALL=https://developer.download.nvidia.cn/compute/redist/jp/v511/pytorch/torch-2.0.0+nv23.05-cp38-cp38-linux_aarch64.whl
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install aiohttp numpy=='1.19.4' scipy=='1.5.3'
 RUN python3 -m pip install --upgrade protobuf
-RUN python3 -m pip install --no-cache $TORCH_INSTALL
+RUN python3 -m pip install --no-cache https://developer.download.nvidia.cn/compute/redist/jp/v511/pytorch/torch-2.0.0+nv23.05-cp38-cp38-linux_aarch64.whl
 
 # torchvision
 WORKDIR /
 RUN git clone --branch v0.15.1 https://github.com/pytorch/vision torchvision
 RUN cd torchvision
-RUN export BUILD_VERSION=0.15.1
-RUN python3 setup.py install	
+RUN export BUILD_VERSION=0.15.1 && python3 setup.py install	
 RUN cd ../; rm -r torchvision
 
 RUN pip install matplotlib

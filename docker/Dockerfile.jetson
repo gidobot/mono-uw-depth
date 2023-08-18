@@ -55,8 +55,9 @@ RUN python3 -m pip install --no-cache https://developer.download.nvidia.cn/compu
 # torchvision
 WORKDIR /
 RUN git clone --branch v0.15.1 https://github.com/pytorch/vision torchvision
-RUN cd torchvision
+WORKDIR /torchvision
 RUN export BUILD_VERSION=0.15.1 && python3 setup.py install	
-RUN cd ../; rm -r torchvision
+WORKDIR /
+RUN rm -r torchvision
 
 RUN pip install matplotlib

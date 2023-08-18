@@ -61,3 +61,4 @@ WORKDIR /
 RUN rm -r torchvision
 
 RUN pip install matplotlib
+RUN pip install pandas

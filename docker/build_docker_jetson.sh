@@ -1,3 +1,3 @@
 #! /bin/bash
 
-docker build -f Dockerfile.jetson -t mono-uw-depth:latest .
+docker build --network=host -f Dockerfile.jetson -t mono-uw-depth:latest .

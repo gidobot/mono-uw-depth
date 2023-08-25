@@ -29,10 +29,13 @@ DATASET = get_example_dataset(train=False, shuffle=False, device=DEVICE)
 OUT_PATH = "data/out"
 SAVE = True
 
-f = open(MODEL_PATH, "rb")
-runtime = trt.Runtime(trt.Logger(trt.Logger.WARNING)) 
+logger = trt.Logger(trt.Logger.WARNING)
+runtime = trt.Runtime(logger)
 
-engine = runtime.deserialize_cuda_engine(f.read())
+with open(MODEL_PATH, "rb") as f:
+    serialized_engine = f.read()
+
+engine = runtime.deserialize_cuda_engine(serialized_engine)
 context = engine.create_execution_context()
 
 
@@ -45,30 +48,24 @@ def gray_to_heatmap(gray, colormap="inferno_r", normalize=True):
     """Takes torch tensor input of shape [Nx1HxW], returns heatmap tensor of shape [Nx3xHxW].\\
     colormap 'inferno_r': [0,1] --> [bright, dark], e.g. for depths\\
     colormap 'inferno': [0,1] --> [dark, bright], e.g. for probabilities"""
-
     # get colormap
     colormap = plt.get_cmap(colormap)
-
     # gray imgs
     gray_img = gray
-
     # normalize image wise
     if normalize:
         gray_img = (gray_img - gray_img.min()) / (gray_img.max() - gray_img.min())
-
     # stack heatmaps batch wise (colormap does not support batches)
     heatmap = colormap(gray_img.squeeze())[..., :3]
-
     return heatmap
 
 total_time_per_image = 0.0
 n_batches = len(dataloader)
+stream = torch.cuda.Stream()
 for batch_id, data in enumerate(dataloader):
-
     # inputs
     rgb = data[0].to('cuda:0')  # RGB image
     prior = data[3].to('cuda:0')  # precomputed features and depth values
-
 
     if not init_flag:
         # Use device pointers already in GPU memory for bindings
@@ -80,7 +77,6 @@ for batch_id, data in enumerate(dataloader):
         # d_input1 = cuda.mem_alloc(1 * prior.nbytes)
         # d_output = cuda.mem_alloc(1 * output.nbytes)
         # bindings = [int(d_input0), int(d_input1), int(d_output)]
-        # # stream = cuda.Stream()
         init_flag = True
     bindings = [rgb.data_ptr(), prior.data_ptr(), outputs[1].data_ptr(), outputs[0].data_ptr()]
 
@@ -90,12 +86,13 @@ for batch_id, data in enumerate(dataloader):
     # cuda.memcpy_htod(d_input0, rgb)
     # cuda.memcpy_htod(d_input1, prior)
     # execute model
-    # context.execute_async_v2(bindings, stream.handle, None)
-    context.execute_v2(bindings)
+    context.execute_async_v2(bindings, stream.cuda_stream, None)
+    # import pdb; pdb.set_trace()
+    # context.execute_async_v3(bindings, stream.cuda_stream, None)
     # transfer predictions back
     # cuda.memcpy_dtoh(output, d_output)
     # syncronize threads
-    # stream.synchronize()
+    stream.synchronize()
     end_time = time.time()
     # time per img
     time_per_img = (end_time - start_time)

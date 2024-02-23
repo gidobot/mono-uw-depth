@@ -54,8 +54,7 @@ def convert():
             model,                  # PyTorch Model
             args=(rgb, prior),      # Input tensor tuple
             f=onnx_model_path,        # Output file (eg. 'output_model.onnx')
-            # opset_version=15,       # Operator support version
-            opset_version=17,       # Operator support version
+            opset_version=14,       # Operator support version
             input_names=['input0', 'input1'],   # Input tensor name (arbitary)
             output_names=['output'], # Output tensor name (arbitary)
             export_params=True

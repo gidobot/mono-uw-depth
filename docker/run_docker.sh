@@ -2,7 +2,7 @@
 
 docker run --rm -it \
 	--net=host \
-	--gpus all \
+    --runtime=nvidia \
 	--ipc=host \
 	--ulimit memlock=-1 \
 	--ulimit stack=67108864 \
@@ -19,3 +19,5 @@ docker run --rm -it \
 	-w /depth_estimation \
 	mono-uw-depth:latest \
 	bash
+
+#	--gpus all \

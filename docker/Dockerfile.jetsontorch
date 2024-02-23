@@ -1,0 +1,17 @@
+FROM nvcr.io/nvidia/l4t-pytorch:r35.2.1-pth2.0-py3
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get upgrade -y && \
+apt-get install -y \
+	git \
+    cmake
+
+# torch2trt
+WORKDIR /
+RUN git clone https://github.com/NVIDIA-AI-IOT/torch2trt
+WORKDIR /torch2trt
+RUN python3 setup.py install
+RUN cmake -B build . && cmake --build build --target install && ldconfig
+WORKDIR /
+#RUN rm -r torch2trt

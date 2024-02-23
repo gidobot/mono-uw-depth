@@ -1,5 +1,5 @@
-#FROM nvcr.io/nvidia/tensorflow:23.07-tf2-py3
-FROM nvcr.io/nvidia/l4t-tensorflow:r35.3.1-tf2.11-py3
+FROM nvcr.io/nvidia/tensorflow:23.07-tf2-py3
+#FROM nvcr.io/nvidia/l4t-tensorflow:r35.3.1-tf2.11-py3
 
 ARG DEBIAN_FRONTEND=noninteractive
 

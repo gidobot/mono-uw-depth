@@ -15,6 +15,7 @@ docker run --rm -it \
 	--cap-add=SYS_PTRACE \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 	-v $PWD/../:/depth_estimation:rw \
+	-v /media/gidobot/data/UWslam_dataset:/media/gidobot/data/UWslam_dataset \
 	-v ~/.docker_bash_history:/root/.bash_history:rw \
 	-w /depth_estimation \
 	mono-uw-depth:latest \

@@ -103,6 +103,14 @@ def test():
                 # m_prediction = prediction[mask][range_mask]
                 m_prediction = prior[:,1,:,:].unsqueeze(0)[mask][range_mask]
 
+                # fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+                # axs[0,0].imshow(prior_feats)
+                # axs[0,1].imshow(prior_depth)
+                # axs[1,0].imshow(rgb)
+                # axs[1,1].imshow(m_prediction)
+                plt.imshow(m_prediction.permute(1,2,0))
+                plt.show()
+
             # loss
             rmse_lin_losses[i].append(rmse_lin(m_prediction, m_target).item())
             rmse_log_losses[i].append(rmse_log(m_prediction, m_target).item())

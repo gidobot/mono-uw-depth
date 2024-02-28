@@ -29,6 +29,7 @@ class InputTargetDataset:
         all_transform=None,
         target_samples_transform=None,
         max_priors=200,
+        depth_scale=1.0,
         shuffle=False,
     ) -> None:
 
@@ -47,6 +48,7 @@ class InputTargetDataset:
         # depth_samples
         self.target_samples_transform = target_samples_transform
         self.max_priors = max_priors
+        # self.depth_scale = depth_scale
 
         # checking dataset for missing files
         if not self.check_dataset():

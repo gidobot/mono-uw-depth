@@ -10,7 +10,9 @@ RUN apt-get update && apt-get upgrade -y &&\
    && rm -rf /var/lib/apt/lists/*
 
 RUN pip install tensorflow==2.12.0 --upgrade
-RUN pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu118
+# RUN pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu118
+RUN pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+# RUN pip install torch==2.0.0+cu117 torchvision==0.15 torchaudio==2.0.0
 RUN pip install \
    onnx \
    onnx_tf \

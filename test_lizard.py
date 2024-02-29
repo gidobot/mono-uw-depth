@@ -8,6 +8,7 @@ from depth_estimation.utils.loss import RMSELoss, SILogLoss, MARELoss
 
 from data.lizard.dataset import get_lizard_dataset
 
+from matplotlib import pyplot as plt
 
 ############################################################
 ###################### CONFIG ##############################
@@ -64,6 +65,7 @@ def test():
         try:
             data = next(dataiter)
         except Exception as e:
+            print(e)
             continue
 
         # inputs
@@ -87,7 +89,7 @@ def test():
             if r is None:
                 m_target = target[mask]
                 # m_prediction = prediction[mask]
-                m_prediction = prior[:,1,:,:].unsqueeze(0)[mask]
+                m_prediction = prior[0,0,:,:].unsqueeze(0).unsqueeze(0)[mask]
 
             # for finite range select pixels with mask
             else:
@@ -101,15 +103,15 @@ def test():
 
                 m_target = target[mask][range_mask]
                 # m_prediction = prediction[mask][range_mask]
-                m_prediction = prior[:,1,:,:].unsqueeze(0)[mask][range_mask]
+                m_prediction = prior[0,0,:,:].unsqueeze(0).unsqueeze(0)[mask][range_mask]
 
                 # fig, axs = plt.subplots(2, 2, figsize=(10, 10))
                 # axs[0,0].imshow(prior_feats)
                 # axs[0,1].imshow(prior_depth)
                 # axs[1,0].imshow(rgb)
                 # axs[1,1].imshow(m_prediction)
-                plt.imshow(m_prediction.permute(1,2,0))
-                plt.show()
+                # plt.imshow(prior[0,0,:,:].cpu())
+                # plt.show()
 
             # loss
             rmse_lin_losses[i].append(rmse_lin(m_prediction, m_target).item())
@@ -123,7 +125,6 @@ def test():
     for i, r in enumerate(ranges):
         print("Number of images: {}".format(len(rmse_lin_losses[i])))
         print(f"Range: {r} m, using MEAN reduction:")
-        import pdb; pdb.set_trace()
         print(f"RMSE (lin): {np.nanmean(rmse_lin_losses[i])}")
         print(f"RMSE (log): {np.nanmean(rmse_log_losses[i])}")
         print(f"RMSE (silog): {np.nanmean(rmse_silog_losses[i])}")

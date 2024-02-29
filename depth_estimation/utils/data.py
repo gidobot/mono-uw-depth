@@ -29,8 +29,9 @@ class InputTargetDataset:
         all_transform=None,
         target_samples_transform=None,
         max_priors=200,
-        depth_scale=1.0,
         shuffle=False,
+        feat_depth_scale=1.0,
+        norm_feats=False
     ) -> None:
 
         # file paths
@@ -48,7 +49,8 @@ class InputTargetDataset:
         # depth_samples
         self.target_samples_transform = target_samples_transform
         self.max_priors = max_priors
-        # self.depth_scale = depth_scale
+        self.feat_depth_scale = feat_depth_scale
+        self.norm_feats = norm_feats
 
         # checking dataset for missing files
         if not self.check_dataset():
@@ -69,7 +71,11 @@ class InputTargetDataset:
 
         # read imgs
         input_img = Image.open(input_fn).resize((640, 480))
-        target_img = Image.open(target_fn).resize((320, 240), resample=Image.NEAREST)
+        if target_fn.endswith('.bin'):
+            target_img = self.read_array(target_fn)
+            target_img = Image.fromarray(target_img).resize((320, 240), resample=Image.NEAREST)
+        else:
+            target_img = Image.open(target_fn).resize((320, 240), resample=Image.NEAREST)
 
         # apply input/target transforms
         input_img = self.input_transform(input_img)
@@ -85,6 +91,11 @@ class InputTargetDataset:
 
         # read sparse depth priors
         depth_samples = self.read_features(depth_samples_fn, device=target_img.device)
+
+        depth_samples[:,-1] = depth_samples[:,-1] / self.feat_depth_scale
+        if self.norm_feats:
+            depth_samples[:,0] = depth_samples[:,0]*240
+            depth_samples[:,1] = depth_samples[:,1]*320
 
         # check if features has at least one entry
         if depth_samples is None:
@@ -106,7 +117,7 @@ class InputTargetDataset:
             )
 
         # list of all output tensors
-        tensor_list = [input_img, target_img, mask, parametrization]
+        tensor_list = [input_img, target_img, mask, parametrization, depth_samples]
 
         # apply mutual transforms
         if self.all_transform is not None:
@@ -147,6 +158,23 @@ class InputTargetDataset:
         depth_samples = torch.from_numpy(depth_samples).to(device)
 
         return depth_samples
+
+    def read_array(self, path):
+        with open(path, "rb") as fid:
+            width, height, channels = np.genfromtxt(fid, delimiter="&", max_rows=1,
+                                                    usecols=(0, 1, 2), dtype=int)
+            fid.seek(0)
+            num_delimiter = 0
+            byte = fid.read(1)
+            while True:
+                if byte == b"&":
+                    num_delimiter += 1
+                    if num_delimiter >= 3:
+                        break
+                byte = fid.read(1)
+            array = np.fromfile(fid, np.float32)
+        array = array.reshape((width, height, channels), order="F")
+        return np.transpose(array, (1, 0, 2)).squeeze()
 
 
 class MutualRandomHorizontalFlip:

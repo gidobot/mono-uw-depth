@@ -60,8 +60,8 @@ for batch_id, data in enumerate(dataloader):
 
     feat_depth = data[4].to(DEVICE).squeeze()
 
-    prior_feats = prior[0,0,:,:].unsqueeze(0).permute(1,2,0)
-    prior_depth = prior[0,1,:,:].unsqueeze(0).permute(1,2,0)
+    prior_depth = prior[0,0,:,:].unsqueeze(0).permute(1,2,0)
+    prior_feats = prior[0,1,:,:].unsqueeze(0).permute(1,2,0)
     # heat_feats = gray_to_heatmap(prior_feats).to(DEVICE)  # for visualization
     # heat_feats = heat_feats.squeeze()
     # heat_depth = gray_to_heatmap(prior_depth).to(DEVICE)  # for visualization
